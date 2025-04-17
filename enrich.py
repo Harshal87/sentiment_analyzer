@@ -16,14 +16,38 @@ def compute_similarity(a, b):
 def get_sentiment(user_input, tags):
     sentence = f"{user_input} - {tags}"
     try:
-        response = requests.post(HF_API_URL, headers=HEADERS, json={"inputs": sentence}, timeout=10)
-        result = response.json()
+        response = requests.post(
+            HF_API_URL,
+            headers=HEADERS,
+            json={"inputs": sentence},
+            timeout=15  # increase timeout
+        )
+
+        try:
+            result = response.json()
+        except Exception as json_err:
+            print("❌ Failed to parse JSON:", json_err)
+            print("📥 Raw Response Text:", response.text)
+            return "Unknown", 0
+
+        if isinstance(result, dict) and "error" in result:
+            print("⚠️ Hugging Face API Error:", result)
+            return "Error", 0
+
+        print("✅ HF Response:", result)
         label = result[0][0]["label"]
         score = round(result[0][0]["score"] * 100, 2)
-        sentiment = "Positive" if "4" in label or "5" in label else "Negative" if "1" in label or "2" in label else "Neutral"
+        sentiment = (
+            "Positive" if "4" in label or "5" in label
+            else "Negative" if "1" in label or "2" in label
+            else "Neutral"
+        )
         return sentiment, score
-    except:
+
+    except requests.exceptions.RequestException as e:
+        print("⚠️ HF Request Exception:", e)
         return "Unknown", 0
+
 
 def enrich_result(doc, query):
     tags = doc.get("reviews_1", "")
