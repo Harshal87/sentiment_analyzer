@@ -3,11 +3,11 @@ import requests
 from difflib import SequenceMatcher
 
 # === CONFIG ===
-ASTRA_DB_TOKEN = "your-astra-token"
-ASTRA_DB_API_ENDPOINT = "your-db-endpoint"
+ASTRA_DB_TOKEN = "AstraCS:LOZryRCyfyqCeJpzAfWZYsAA:ff54edbe919c68c7b2c8b236ebd3ba0c8c2cef55313fb381ab5d8958ddf97045"
+ASTRA_DB_API_ENDPOINT = "https://fdc90b78-019f-4b61-8c87-a56bba9e070e-us-east-2.apps.astra.datastax.com"
 COLLECTION_NAME = "zomato_pune_1"
 HF_API_URL = "https://api-inference.huggingface.co/models/nlptown/bert-base-multilingual-uncased-sentiment"
-HF_TOKEN = "your-huggingface-token"
+HF_TOKEN = "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"
 HEADERS = {"Authorization": f"Bearer {HF_TOKEN}"}
 
 def compute_similarity(a, b):
