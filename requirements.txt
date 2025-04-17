@@ -2,3 +2,5 @@ fastapi
 uvicorn
 astrapy
 requests
+python-multipart
+
