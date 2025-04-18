@@ -1,24 +1,13 @@
+# main.py
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List
 from enrich import enrich_result, ASTRA_DB_TOKEN, ASTRA_DB_API_ENDPOINT, COLLECTION_NAME, DataAPIClient
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Enable CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # ← or restrict to ["http://localhost:5500"] etc.
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-
 class Query(BaseModel):
     query: str
+    area: str
 
 @app.post("/search")
 def search_restaurants(data: Query):
@@ -32,6 +21,11 @@ def search_restaurants(data: Query):
         limit=30
     )
 
-    enriched = [enrich_result(doc, data.query) for doc in results]
-    sorted_results = sorted(enriched, key=lambda x: (x["sentiment_score"], x["similarity"]), reverse=True)
+    enriched = [enrich_result(doc, data.query, data.area) for doc in results]
+
+    sorted_results = sorted(
+        enriched,
+        key=lambda x: (-x["sentiment_score"], x.get("distance_km", float("inf")))
+    )
+
     return sorted_results[:8]
